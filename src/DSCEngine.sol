@@ -57,6 +57,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__NotAllowedToken();
     error DSCEngine__TransferFailed();
     error DSCEngine__BreaksHealthFactor(uint256 healthFactor);
+    error DSCEngine__MintFailed();
 
     //////////////////////////////
     ///////state Variables ///////
@@ -177,6 +178,10 @@ contract DSCEngine is ReentrancyGuard {
     ) external moreThanZero(amountDSCToMint) nonReentrant {
         s_DSCMinted[msg.sender] += amountDSCToMint;
         _revertIfHealthFactorIsBroken(msg.sender);
+        bool minted = i_dsc.mint(msg.sender, amountDSCToMint);
+        if (!minted) {
+            revert DSCEngine__MintFailed();
+        }
     }
 
     function burnDSC() external {}
@@ -209,9 +214,10 @@ contract DSCEngine is ReentrancyGuard {
             uint256 totalDSCMinted,
             uint256 collateralValueInUsd
         ) = _getAccountInformation(user);
-        uint256 collateralAdjustedOrThreshold = (collateralValueInUsd * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISION;
-        return (collateralAdjustedOrThreshold * PRECISION ) / totalDSCMinted;
-    //    return collateralValueInUsd /totalDSCMinted;
+        uint256 collateralAdjustedOrThreshold = (collateralValueInUsd *
+            LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISION;
+        return (collateralAdjustedOrThreshold * PRECISION) / totalDSCMinted;
+        //    return collateralValueInUsd /totalDSCMinted;
     }
 
     // 1. check health factor (do they have enough collateral)
