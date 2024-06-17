@@ -22,6 +22,7 @@
 // view & pure functions
 
 /**
+ * Om Ganeshay Namah !!
  * @title DSCEngine
  * @author Pandit dhamdhere (https://github.com/panditdhamdhere)
  *
@@ -185,6 +186,7 @@ contract DSCEngine is ReentrancyGuard {
     }
 
     function burnDSC() external {}
+      
 
     function liquidate() external {}
 
