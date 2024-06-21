@@ -28,8 +28,19 @@ contract Handler is Test {
     }
 
     function mintDsc(uint256 amount) public {
-        amount = bound(amount, 1, MAX_DEPOSITE_SIZE);
+        (uint256 totalDscminted, uint256 collateralValueInUsd) = dsce
+            .getAccountInformation(msg.sender);
+        uint256 maxDscToMint = (collateralValueInUsd / 2) - totalDscminted;
 
+        if (maxDscToMint < 0) {
+            return;
+        }
+        // amount = bound(amount, 1, MAX_DEPOSITE_SIZE);
+
+        amount = bound(amount, 0, uint256(maxDscToMint));
+        if (amount == 0) {
+            return;
+        }
         vm.startPrank(msg.sender);
         dsce.mintDsc(amount);
         vm.stopPrank();
