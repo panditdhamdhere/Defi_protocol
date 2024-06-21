@@ -16,6 +16,8 @@ contract Handler is Test {
     ERC20Mock weth;
     ERC20Mock wbtc;
 
+    uint256 MAX_DEPOSITE_SIZE = type(uint96).max; // the max uint96 value
+
     constructor(DSCEngine _dscEngine, DecentralizedStableCoin _dsc) {
         dsce = _dscEngine;
         dsc = _dsc;
@@ -32,6 +34,8 @@ contract Handler is Test {
         uint256 amountCollateral
     ) public {
         ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
+        amountCollateral = bound(amountCollateral, 1, MAX_DEPOSITE_SIZE);
+
         dsce.depositeCollateral(address(collateral), amountCollateral);
     }
 
